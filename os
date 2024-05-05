@@ -434,3 +434,68 @@ int main()
     }
     return 0;
 }
+
+//other way of doing first lab
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+
+#define BUF_SIZE 1024
+
+int main(){
+    int fileOne, fileTwo;
+    ssize_t bytesRead;
+    char buffer[BUF_SIZE];
+
+    fileOne = open("fileOne.txt", O_RDONLY);
+    if(fileOne < 0){
+        perror("Error opening fileOne.txt");
+        return 1;
+    }
+    
+    const char *dataToWrite = "Hello, World!";
+    if (write(fileOne, dataToWrite, strlen(dataToWrite)) < 0){
+        perror("Error writing to fileOne.txt");
+        return 1;
+    }
+    if (close(fileOne) < 0){
+        perror("Error closing fileOne.txt");
+        return 1;
+    }
+
+    fileOne = open("fileOne.txt", O_RDONLY);
+    if (fileOne < 0){
+        perror("Error opening fileOne.txt");
+        return 1;
+    }
+
+    fileTwo = open("fileTwo.txt", O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+    if (fileTwo < 0){
+        perror("Error opening fileTwo.txt");
+        return 1;
+    }
+
+    while ((bytesRead = read(fileOne, buffer, BUF_SIZE)) > 0){
+        if (write(fileTwo, buffer, bytesRead) < 0){
+            perror("Error writing to fileTwo.txt");
+            return 1;
+        }
+    }
+
+    if (bytesRead < 0){
+        perror("Error reading from fileOne.txt");
+        return 1;
+    }
+
+    if (close(fileOne) < 0){
+        perror("Error closing fileOne.txt");
+        return 1;
+    }
+
+    if (close(fileTwo) < 0){
+        perror("Error closing fileTwo.txt");
+        return 1;
+    }
+
+    return 0;
+}
