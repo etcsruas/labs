@@ -435,82 +435,79 @@ int main(){
 }
 
 void stopAndWait(){
-  int n, i=0, frame;
+  int totalFrames, receivedFrame, i = 0;
   printf("Enter the total number of frames: ");
-  scanf("%d", &n);
-  while(i!=n){
+  scanf("%d", &totalFrames);
+  
+  while(i != totalFrames){
     printf("\nEnter received frame: ");
-    scanf("%d", &frame);
-    if (frame == i+1){
-      printf("Transmitting.... ACK to frame %d\n", frame);
+    scanf("%d", &receivedFrame);
+    
+    if (receivedFrame == i+1){
+      printf("Transmitting.... ACK to frame %d\n", receivedFrame);
       i++;
     }
     else{
-      printf("Negative ACK.... to frame %d", i+1);
+      printf("Negative ACK.... to frame %d\n", i+1); // Added newline character
     }
   }
 }
 
-void goBackN()
-{
-	int windowsize,sent=0,ack,i;
-	printf("enter window size\n");
-	scanf("%d",&windowsize);
-	while(1)
-	{
-		for( i = 0; i < windowsize; i++)
-			{
-				printf("Frame %d has been transmitted.\n",sent);
-				sent++;
-				if(sent == windowsize)
-					break;
-			}
-			printf("\nPlease enter the last Acknowledgement received.\n");
-			scanf("%d",&ack);
-			
-			if(ack == windowsize)
-				break;
-			else
-				sent = ack;
-	}
-return 0;
+
+void goBackN(){
+  int windowSize, sent = 0, ack, i;
+  printf("Enter window size: ");
+  scanf("%d", &windowSize);
+  
+  while(1){
+    for(i = 0; i < windowSize; i++){
+      printf("Frame %d has been transmitted.\n", sent);
+      sent++;
+      if(sent == windowSize)
+        break;
+    }
+    printf("\nPlease enter the last Acknowledgement received: ");
+    scanf("%d", &ack);
+    
+    if(ack == windowSize)
+      break;
+    else
+      sent = ack;
+  }
 }
+
 
 void selectiveRepeat(){
-  int n, i=0, frame, m, size;
+  int totalFrames, receivedFrames, frame, i, j;
   printf("Enter the total number of frames: ");
-  scanf("%d", &n);
-  printf("Sending frames");
-  for(int j=0;j<n;j++){
-    printf("%d", j+1);
+  scanf("%d", &totalFrames);
+  
+  printf("Sending frames: ");
+  for(i = 0; i < totalFrames; i++){
+    printf("%d ", i+1);
   }
-  printf("\nEnter the number of frames receieved\n");
-  scanf("%d", &m);
-  int a[n];
-  printf("\nEnter received frame\n");
-  for(int i=0;i<m;i++){
-    scanf("%d", &a[i]);
-    int trigger = 0;
-    for(int j=0;j<m;j++){
-      if (i+1 == a[j]){
-        trigger = 1;
+  
+  printf("\nEnter the number of frames received: ");
+  scanf("%d", &receivedFrames);
+  
+  int received[totalFrames];
+  printf("\nEnter received frames: ");
+  for(i = 0; i < receivedFrames; i++){
+    scanf("%d", &received[i]);
+  }
+  
+  printf("Retransmitting missing frames: ");
+  for(i = 0; i < totalFrames; i++){
+    int found = 0;
+    for(j = 0; j < receivedFrames; j++){
+      if(received[j] == i+1){
+        found = 1;
+        break;
       }
     }
-    if (trigger = 0){
-      printf("Retransmitting frame %d\n", i+1);
-      a[m++] = i+1;
+    if(!found){
+      printf("%d ", i+1);
     }
-  }
-  for (int i=0;i<n;i++){
-    for (int j=0;j<n;j++){
-      if (a[i]<a[j]){
-        int temp = a[i];
-        a[j] = temp;
-      }
-    }
-  }
-  printf("\nSorting ");
-  for (int i=0;i<n;i++){
-    printf("%d", a[i]);
   }
 }
+
