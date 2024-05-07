@@ -2,42 +2,41 @@
 #include <stdio.h>
 
 int main(){
-    int bit[256], i, size;
-    int icount, parity;
-
-    printf("Enter the size of the bit: \n");
+    int bits[256], parity;
+    int i, size, count=0;
+    
+    printf("Enter the size of the bit array: ");
     scanf("%d", &size);
-
-    printf("Enter the bit stream\n");
+    printf("\n");
+    
+    printf("Enter the bit array: \n");
     for (i=0;i<size;i++){
         printf("Enter bit: ");
-        scanf("%d", &bit[i]);
+        scanf("%d", &bits[i]);
     }
-
-    printf("Entered bit stream: ");
+    
+    printf("Entered bit array is: ");
     for (i=0;i<size;i++){
-        printf("%d", bit[i]);
+        printf("%d", bits[i]);
     }
     printf("\n");
-
+    
     for (i=0;i<size;i++){
-        if (bit[i] == 1){
-            icount++;
+        if (bits[i] == 1){
+            count++;
         }
     }
-
-    if (icount%2 == 0){
+    if (count%2 == 0){
         parity = 0;
     }
     else{
         parity = 1;
     }
-    bit[size+1] = parity;
-
-    printf("Parity of the given bit stream is: %d", parity);
-    printf("Output bitstream is: ");
-    for (i=0;i<size+1;i++){
-        printf("%d", bit[i]);
+    bits[size] = parity;
+    printf("Parity bit is: %d\n", parity);
+    printf("Modified bit array is: ");
+    for (i=0;i<=size;i++){
+        printf("%d", bits[i]);
     }
 }
 
@@ -45,24 +44,23 @@ int main(){
 #include <stdio.h>
 
 int main(){
-    int row, col, bits[256][256];
-    int i, j;
-    int count = 0;
+    int bits[256][256], row, col;
+    int i, j, count=0;
 
     printf("Enter the number of rows: ");
     scanf("%d", &row);
     printf("Enter the number of columns: ");
     scanf("%d", &col);
 
-    printf("Enter the bit stream");
+    printf("Enter the bits: ");
     for (i=0;i<row;i++){
         for (j=0;j<col;j++){
-            printf("Enter bit: ");
+            printf("Enter the bit: ");
             scanf("%d", &bits[i][j]);
         }
     }
 
-    printf("Given bit stream is: \n");
+    printf("Given bit array is: \n");
     for (i=0;i<row;i++){
         for (j=0;j<col;j++){
             printf("%d", bits[i][j]);
@@ -72,44 +70,29 @@ int main(){
 
     //row parity
     for (i=0;i<row;i++){
+        int rowParity = 0;
         for (j=0;j<col;j++){
-            if (bits[i][j] == 1){
-                count++;
-            }
-            if (count%2==0){
-                bits[i][col] = 0;
-            }
-            else{
-                bits[i][col] = 1;
-            }
+            rowParity += bits[i][j];
         }
-        count = 0;
+        bits[i][col] = rowParity%2;
     }
 
-    //column parity
-    for (i=0;i<row;i++){
-        for (j=0;j<=col;j++){
-            if (bits[i][j] == 1){
-                count++;
-            }
-            if (count%2 == 0){
-                bits[row][j] = 0;
-            }
-            else{
-                bits[row][j] = 1;
-            }
+    //col parity
+    for (j=0;j<row;j++){
+        int colParity = 0;
+        for (i=0;i<col;i++){
+            colParity += bits[i][j];
         }
-        count = 0;
+        bits[row][j] = colParity%2;
     }
-
-    printf("Output stream is: \n");
+    
+    printf("Modified bit array is: \n");
     for (i=0;i<=row;i++){
         for (j=0;j<=col;j++){
             printf("%d", bits[i][j]);
         }
         printf("\n");
     }
-
 }
 
 //crc check
