@@ -208,7 +208,144 @@ int main(){
     return 0;
 }
 
-//neighbour table determination
+//crc ver2
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_DATA_SIZE 32
+#define MAX_POLY_SIZE 64
+
+char data[MAX_DATA_SIZE + MAX_POLY_SIZE];
+char rem[MAX_POLY_SIZE];
+char gen_poly[MAX_POLY_SIZE]; // Define gen_poly with maximum size
+int data_len, ch;
+
+void chooseGeneratingPolynomial() {
+    printf("\n Press 1 for CRC-8"
+           "\n Press 2 for CRC-10"
+           "\n Press 3 for CRC-16"
+           "\n Press 4 for CRC-32"
+           "\n Choice: ");
+    scanf("%d", &ch);
+
+    switch (ch) {
+        case 1:
+            strcpy(gen_poly, "100000111"); // CRC-8 polynomial
+            break;
+        case 2:
+            strcpy(gen_poly, "11000110101"); // CRC-10 polynomial
+            break;
+        case 3:
+            strcpy(gen_poly, "10001000000100001"); // CRC-16 polynomial
+            break;
+        case 4:
+            strcpy(gen_poly, "100000001000000010010000111000110"); // CRC-32 polynomial
+            break;
+        default:
+            printf("Invalid Choice");
+    }
+
+    printf("\n Generating polynomial is: %s", gen_poly);
+}
+
+void xor() {
+    for (int c = 1; c < strlen(gen_poly); c++) {
+        rem[c] = ((rem[c] == gen_poly[c]) ? '0' : '1');
+    }
+}
+
+void remCal() {
+    int e, c;
+    for (e = 0; e < strlen(gen_poly); e++)
+        rem[e] = data[e];
+    do {
+        if (rem[0] == '1')
+            xor();
+        for (int c = 0; c < strlen(gen_poly) - 1; c++)
+            rem[c] = rem[c + 1];
+        rem[c] = data[e++];
+    }
+    while (e <= data_len + strlen(gen_poly) + 1);
+}
+
+void sender() {
+    data_len = strlen(data);
+    for (int i = data_len; i < data_len + strlen(gen_poly) - 1; i++)
+        data[i] = '0';
+    printf("\n \n Modified data is: %s", data);
+    remCal();
+    printf("\n Remainder is: %s", rem);
+    for (int i = data_len; i < data_len + strlen(gen_poly) - 1; i++)
+        data[i] = rem[i - data_len];
+    printf("\n Final codeword being transmitted is: %s", data);
+}
+
+int checkError() {
+    remCal();
+    int errorDetected = 0;
+    for (int i = 0; i < strlen(gen_poly) - 1; i++) {
+        if (rem[i] != '0') {
+            errorDetected = 1;
+            break;
+        }
+    }
+    if (errorDetected)
+        printf("\n Error detected, data processing aborted");
+    else
+        printf("\n No error detected, proceed to data processing");
+    return errorDetected;
+}
+
+
+void receiver() {
+    printf("\n Code received"
+           "\n Press 0 to detect error"
+           "\n Press 1 to introduce errors: ");
+    scanf("%d", &ch);
+    if (ch == 0)
+        checkError();
+    else if (ch == 1) { // Corrected condition check
+        do {
+            int i;
+            printf("\n Enter the position where error is to be inserted: ");
+            scanf("%d", &i);
+            if (i > 0 && i <= data_len + strlen(gen_poly) - 1) { // Validate position
+                data[i - 1] = (data[i - 1] == '0') ? '1' : '0';
+                printf("\n Press 1 to introduce more errors"
+                       "\n Press 0 to continue"
+                       "\n Option: ");
+                scanf("%d", &ch);
+            } else {
+                printf("\nInvalid position. Please enter a position between 1 and %d.", data_len + strlen(gen_poly) - 1);
+            }
+        } while (ch == 1);
+        printf("\n Data at receiver: %s", data);
+        checkError();
+    } else {
+        printf("\n Invalid Option");
+    }
+}
+
+int main() {
+    int data_size;
+    printf("\n Enter the data size (max %d bits): ", MAX_DATA_SIZE);
+    scanf("%d", &data_size);
+    if (data_size > MAX_DATA_SIZE) {
+        printf("\n Data size exceeds the maximum limit. Please enter a value less than or equal to %d.", MAX_DATA_SIZE);
+        return 1;
+    }
+    printf("\n Enter the %d-bit data: ", data_size);
+    scanf("%s", data);
+    if (strlen(data) != data_size) {
+        printf("\n Data size does not match the specified size. Please enter exactly %d bits.", data_size);
+        return 1;
+    }
+    chooseGeneratingPolynomial();
+    sender();
+    receiver();
+    return 0;
+}
 // neighbour determination table
 
 #include <stdio.h>
