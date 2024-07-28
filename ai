@@ -1,0 +1,371 @@
+// uninformed searches
+//depth first search
+def dfs(graph, start, visited=None):
+    if visited is None:
+        visited = set()
+    visited.add(start)
+
+    print(start)
+
+    for next in graph[start] - visited:
+        dfs(graph, next, visited)
+    return visited
+
+graph = {
+    'A': set(['B', 'C']),
+    'B': set(['A', 'D', 'E']),
+    'C': set(['A', 'F']),
+    'D': set(['B']),
+    'E': set(['B', 'F']),
+    'F': set(['C', 'E'])
+}
+
+dfs(graph, 'A')
+
+//breadth first search
+def bfs(graph, start):
+    visited, queue = set(), [start]
+    while queue:
+        vertex = queue.pop(0)
+        if vertex not in visited:
+            visited.add(vertex)
+            print(vertex)
+            queue.extend(graph[vertex] - visited)
+    return visited
+
+graph = {
+    'A': set(['B', 'C']),
+    'B': set(['A', 'D', 'E']),
+    'C': set(['A', 'F']),
+    'D': set(['B']),
+    'E': set(['B', 'F']),
+    'F': set(['C', 'E'])
+}
+
+bfs(graph, 'A')
+
+//uniform cost search
+import heapq
+
+def uniform_cost_search(graph, start, goal):
+    # Priority queue for the frontier with tuples of (cost, node, path)
+    frontier = [(0, start, [])]
+    # Explored set to keep track of explored nodes
+    explored = set()
+    
+    while frontier:
+        # Pop the node with the lowest cost
+        cost, current_node, path = heapq.heappop(frontier)
+        
+        # If we have reached the goal, return the path and cost
+        if current_node == goal:
+            return path + [current_node], cost
+        
+        # If the current node has been explored, skip it
+        if current_node in explored:
+            continue
+        
+        # Mark the current node as explored
+        explored.add(current_node)
+        
+        # Add neighbors to the frontier
+        for neighbor, edge_cost in graph.get(current_node, {}).items():
+            if neighbor not in explored:
+                heapq.heappush(frontier, (cost + edge_cost, neighbor, path + [current_node]))
+    
+    # If the goal was not reached, return None
+    return None, float('inf')
+
+# Example graph represented as an adjacency list
+graph = {
+    'A': {'B': 1, 'C': 4},
+    'B': {'C': 2, 'D': 5},
+    'C': {'D': 1},
+    'D': {}
+}
+
+start = 'A'
+goal = 'D'
+path, cost = uniform_cost_search(graph, start, goal)
+print(f"Path: {path}, Cost: {cost}")
+
+
+// informed search
+//a star
+import heapq
+
+def aStarAlgo(start_node, stop_node):
+    open_set = [(0, start_node)]  # Priority queue: (f(n), node)
+    closed_set = set()
+    g = {start_node: 0}  # store distance from starting node
+    parents = {start_node: start_node}  # parents contains an adjacency map of all nodes
+
+    while open_set:
+        _, n = heapq.heappop(open_set)
+
+        if n == stop_node or Graph_nodes[n] is None:
+            break
+
+        closed_set.add(n)
+
+        for m, weight in Graph_nodes[n]:
+            tentative_g = g[n] + weight
+
+            if m not in closed_set and (m not in g or tentative_g < g[m]):
+                g[m] = tentative_g
+                f = tentative_g + heuristic(m)
+                heapq.heappush(open_set, (f, m))
+                parents[m] = n
+
+    if n != stop_node:
+        print('Path does not exist!')
+        return None
+
+    # Reconstruct path
+    path = []
+    while n != start_node:
+        path.append(n)
+        n = parents[n]
+    path.append(start_node)
+    path.reverse()
+    print('Path found: {}'.format(path))
+    return path
+
+def heuristic(n):
+    H_dist = {
+        'A': 11, 'B': 6, 'C': 5, 'D': 7, 'E': 3,
+        'F': 6, 'G': 5, 'H': 3, 'I': 1, 'J': 0
+    }
+    return H_dist[n]
+
+# Describe your graph here
+Graph_nodes = {
+    'A': [('B', 6), ('F', 3)],
+    'B': [('A', 6), ('C', 3), ('D', 2)],
+    'C': [('B', 3), ('D', 1), ('E', 5)],
+    'D': [('B', 2), ('C', 1), ('E', 8)],
+    'E': [('C', 5), ('D', 8), ('I', 5), ('J', 5)],
+    'F': [('A', 3), ('G', 1), ('H', 7)],
+    'G': [('F', 1), ('I', 3)],
+    'H': [('F', 7), ('I', 2)],
+    'I': [('E', 5), ('G', 3), ('H', 2), ('J', 3)],
+}
+
+aStarAlgo('A', 'J')
+
+//best fit
+from queue import PriorityQueue
+v = 14
+graph = [[] for i in range(v)]
+
+# Function For Implementing Best First Search
+# Gives output path having lowest cost
+
+def best_first_search(actual_Src, target, n):
+    visited = [False] * n
+    pq = PriorityQueue()
+    pq.put((0, actual_Src))
+    visited[actual_Src] = True
+    
+    while pq.empty() == False:
+        u = pq.get()[1]
+        # Displaying the path having lowest cost
+        print(u, end=" ")
+        if u == target:
+            break
+
+        for v, c in graph[u]:
+            if visited[v] == False:
+                visited[v] = True
+                pq.put((c, v))
+    print()
+
+# Function for adding edges to graph
+
+def addedge(x, y, cost):
+    graph[x].append((y, cost))
+    graph[y].append((x, cost))
+
+# The nodes shown in above example(by alphabets) are
+# implemented using integers addedge(x,y,cost);
+addedge(0, 1, 3)
+addedge(0, 2, 6)
+addedge(0, 3, 5)
+addedge(1, 4, 9)
+addedge(1, 5, 8)
+addedge(2, 6, 12)
+addedge(2, 7, 14)
+addedge(3, 8, 7)
+addedge(8, 9, 5)
+addedge(8, 10, 6)
+addedge(9, 11, 1)
+addedge(9, 12, 10)
+addedge(9, 13, 2)
+
+source = 0
+target = 9
+best_first_search(source, target, v)
+
+//water jug
+from collections import deque
+
+def BFS(a, b, target):
+
+    m = {}
+    isSolvable = False
+    path = []
+
+    q = deque()
+
+    q.append((0, 0))
+
+    while (len(q) > 0):
+        u = q.popleft()# If this state is already visited
+        if ((u[0], u[1]) in m):
+            continue
+        if ((u[0] > a or u[1] > b or
+            u[0] < 0 or u[1] < 0)):
+            continue
+
+        # Filling the vector for constructing
+        # the solution path
+        path.append([u[0], u[1]])
+
+        # Marking current state as visited
+        m[(u[0], u[1])] = 1
+
+        # If we reach solution state, put ans=1
+        if (u[0] == target or u[1] == target):
+            isSolvable = True
+
+            if (u[0] == target):
+                if (u[1] != 0):
+
+                    # Fill final state
+                    path.append([u[0], 0])
+            else:
+                if (u[0] != 0):
+
+                    # Fill final state
+                    path.append([0, u[1]])
+
+            # Print the solution path
+            sz = len(path)
+            for i in range(sz):
+                print("(", path[i][0], ",",
+                    path[i][1], ")")
+            break
+
+        # If we have not reached final state
+        # then, start developing intermediate
+        # states to reach solution state
+        q.append([u[0], b]) # Fill Jug2
+        q.append([a, u[1]]) # Fill Jug1
+
+        for ap in range(max(a, b) + 1):
+
+            # Pour amount ap from Jug2 to Jug1
+            c = u[0] + ap
+            d = u[1] - ap
+
+            # Check if this state is possible or not
+            if (c == a or (d == 0 and d >= 0)):
+                q.append([c, d])
+
+            # Pour amount ap from Jug 1 to Jug2
+            c = u[0] - ap
+            d = u[1] + ap
+
+            # Check if this state is possible or not
+            if ((c == 0 and c >= 0) or d == b):
+                q.append([c, d])
+
+        # Empty Jug2
+        q.append([a, 0])
+
+        # Empty Jug1
+        q.append([0, b])
+
+    # No, solution exists if ans=0
+    if (not isSolvable):
+        print("No solution")
+
+# Driver code
+if __name__ == '__main__':
+
+    Jug1, Jug2, target = 4, 3, 2
+    print("Path from initial state "
+        "to solution state ::")
+
+    BFS(Jug1, Jug2, target)
+
+//pandas
+import pandas as pd
+dataframe = pd.read_csv('file.csv')
+type(dataframe)
+pd.set_option('display.max_columns', 5)//display columns with five values
+dataframe.head(5)//display columns with five values
+list(dataframe.columns)//display all columns
+dataframe.head(5).transpose()
+dataframe[0:5]//first five elements
+dataframe[-5:]//last five elements
+dataframe.shape//dimension of dataset
+dataframe['feature1']//display only this one
+dataframe.feature1.value_counts()//displays frequency of each value of a feature
+dataframe[dataframe['feature1']>1.5]//displays those value above 1.5
+dataframe.drop('feature1', inplace=True, axis=1)//deletes a column
+list(dataframe)
+
+//numpy
+import numpy
+import pandas as pd
+dataframe = pd.read_csv('file.csv')
+ to_compute = dataframe['Selling Price (Lakh)']//the thing we are working on
+ mean_value = numpy.mean(to_compute)
+median_value = numpy.median(to_compute)
+from scipy import stats
+mode_value = stats.mode(to_compute)
+std_value = numpy.std(to_compute)//standard deviation
+variance_value = numpy.var(to_compute)
+percentile_value = numpy.percentile(to_compute, 95)
+big_data = numpy.random.uniform(0, 10, 350)//create big data
+
+//matplotlib and seaborn
+import matplotlib.pyplot as plot
+import seaborn as sea
+sea.barplot(x='feature1', y='feature2', data= dataframe) //add hue='Year'
+plot.hist(dataframe['feature1']) //add bins=5
+sea.displot(dataframe['feature1'])
+sea.boxplot(dataframe['feature1'])
+plot.scatter(x=dataframe['feature1'], y=dataframe['feature2'])//scatterplot
+sea.pairplot(dataframe[['feature1', 'feature2', 'feature3']], height=5)
+sea.heatmap(dataframe[['feature1', 'feature2', 'feature3']], annot=True)
+
+//k nearest neighbour
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+import pandas as pd
+dataframe = pd.read_csv("D:\\sixth sem\\ai\\iris.csv")
+dataframe.head(5)
+dataframe['Species'].value_counts()
+x = dataframe.drop(['Id','Species'], axis=1)
+y = dataframe['Species']
+x.head(5)
+y.head(5)
+train_x, test_x, train_y, test_y = train_test_split(x, y, train_size=0.8, random_state=80)
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(train_x, train_y)
+knn.score(test_x, test_y)
+
+//decision tree
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+import pandas as pd
+dataframe = pd.read_csv('file.csv')
+x = dataframe.drop(['Result'], axis=1)
+y = dataframe['Result']
+train_x, test_x, train_y, test_y = train_test_split(x, y, test_size=0.2, random_state=100)
+estimated = DecisionTreeClassifier().fit(train_x, train_y)
+predict_y = estimated.predict(test_x)
+print(predict_y)
+print(accuracy_score(test_y, predict_y))
