@@ -1,0 +1,26 @@
+Resource Layer
+add new project-web application-next on all. 
+go to source package new java package as entities add RESTful webservices from db inside
+add connection using mysql j driver add all tables then test resource uri
+
+Business Layer
+same web app on src pck add RESTful from patterns click on container.
+name it as businesslogic logics will also be created
+add another java pck in src name as entities and copy the tables from RL entities
+do refactor copy.
+on logics go to end where @Path is there and insert code generate REST client
+go on browse and select the user one
+modify @GET and @POST change gtype getxml to generic using gen ctrlspace
+test resource uri under /items
+
+Presentation Layer
+new web here click on java server faces as framework
+in src create java pck services with all tables.java
+create another java pck named as beans
+inside beans add jsf managed beans make it request scoped.
+add insert code generate REST client in managed bean at end remove the second function first
+insert from BL the place with /items.
+add private string and their getters and setters.
+add getXml and getUserList() from other.
+change index.html page
+add jsf pages for new user added and list users under web pages as a whole.
