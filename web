@@ -24,3 +24,131 @@ add private string and their getters and setters.
 add getXml and getUserList() from other.
 change index.html page
 add jsf pages for new user added and list users under web pages as a whole.
+
+code to be added in BLL
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    public List<User> getUsers() {
+        //TODO return proper representation object
+        UserFacadeREST_JerseyClient UserClient = new UserFacadeREST_JerseyClient();
+        GenericType<List<User>> gType = new GenericType<List<User>>() {};
+        List<User> persons = (List<User>) UserClient.findAll_XML(gType);
+        return persons;
+    }
+
+    @POST
+    @Consumes("application/xml")
+    @Produces("application/xml")
+    public Response CreateUsers(User content) {
+        //TODO
+        UserFacadeREST_JerseyClient UserClient1 = new UserFacadeREST_JerseyClient();
+        UserClient1.create_XML(content);
+        return Response.created(context.getAbsolutePath()).build();
+    }
+
+code to be added in PL
+in jsfmanagedbean
+    private String userName;
+    private String email;
+    private String password;
+    private List<User> userdetails; 
+    //add getters and setters
+
+public String getUsersList(){
+        //get list of users
+        BusinessLogicsResource_JerseyClient BpClient = new BusinessLogicsResource_JerseyClient();
+        GenericType<List<User>> gType = new GenericType<List<User>>() {};
+        List<User> persons = (List<User>) BpClient.GetUsers(gType);
+        List<User> listofusers = new ArrayList<User>();
+        for (User p : persons) {
+            listofusers.add(p);
+        }
+        userdetails = listofusers;
+        return "List of Users";
+    }
+    
+     public String addUser() {
+        //Registration for New Users 
+        BusinessLogicsResource_JerseyClient BpClient1 = new BusinessLogicsResource_JerseyClient();
+        User b = new User();
+        b.setEmail(email);
+        b.setUsername(userName);
+        b.setPassword(password);
+        BpClient1.CreateUser(b);
+        return "New User Added";
+    }
+at the end add REST client using /items from BLL
+
+index.xhtml
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<head>
+    <title>Registration Page</title>
+</head>
+<body>
+    <h:form>
+        <h:panelGrid columns="2" cellpadding="5">
+            <h:outputLabel for="username" value="Username:" />
+            <h:inputText id="username" value="#{clientLogicManagedBean.userName}" />
+
+            <h:outputLabel for="email" value="Email:" />
+            <h:inputText id="email" value="#{clientLogicManagedBean.email}" />
+
+            <h:outputLabel for="password" value="Password:" />
+            <h:inputSecret id="password" value="#{clientLogicManagedBean.password}" />
+        </h:panelGrid>
+        <h:commandButton value="Register" action="#{clientLogicManagedBean.addUser()}" />
+    </h:form>
+    <h:form>
+        <h:commandButton value="List of Users" action="#{clientLogicManagedBean.getUsersList()}" />    
+    </h:form>
+</body>
+</html>
+
+new user added.xhtml
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <h:form>
+        <h:commandButton value="List of Users" action="#{clientLogicManagedBean.getUsersList()}" />    
+        </h:form>
+        
+    </h:body>
+</html>
+
+list of users.xhtml
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<head>
+    <title>User List</title>
+</head>
+<body>
+    <h2>User List</h2>
+    <h:form>
+        <h:dataTable value="#{clientLogicManagedBean.userdetails}" var="user" border="1">
+            <h:column>
+                <f:facet name="header">Username</f:facet>
+                #{user.username}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Email</f:facet>
+                #{user.email}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Password</f:facet>
+                #{user.password}
+            </h:column>
+        </h:dataTable>
+    </h:form>
+</body>
+</html>
+
